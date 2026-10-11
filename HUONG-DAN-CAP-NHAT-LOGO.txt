@@ -1,0 +1,15 @@
+CẬP NHẬT LOGO ĐẾM NGÀY+ TRÊN GITHUB
+
+1. Giải nén tập tin Dem-Ngay-Plus-Co-Logo.zip.
+2. Vào https://github.com/khiem292/dem-ngay-plus
+3. Chọn Add file > Upload files trên nhánh main.
+4. Kéo THỰC SỰ TẤT CẢ file và thư mục icons từ bên trong thư mục vừa giải nén vào vùng upload:
+   index.html, manifest.webmanifest, service-worker.js, icons (và các file .txt nếu muốn).
+   Đảm bảo thư mục icons được giữ với đường dẫn icons/apple-touch-icon.png,
+   icons/icon-192.png, icons/icon-512.png, icons/logo.png.
+5. Chọn Commit changes (đè các file cũ trùng tên nếu GitHub hiển thị như vậy).
+6. Đợi GitHub Pages triển khai, tải lại trang web trên Safari.
+7. Nếu trước đây đã thêm app vào Màn hình chính, xóa biểu tượng cũ và
+   mở web bằng Safari > Chia sẻ > Thêm vào Màn hình chính lần nữa.
+
+Ứng dụng vẫn giữ chức năng đếm ngày và cộng/trừ ngày.

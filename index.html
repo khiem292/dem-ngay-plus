@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#eef4ff">
-  <meta name="description" content="Đếm số ngày từ hôm nay đến một ngày bạn chọn, hoặc cộng thêm số ngày vào một ngày bắt đầu.">
+  <meta name="description" content="Đếm ngày, cộng hoặc trừ ngày và tháng để tìm ngày chính xác.">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Đếm Ngày+">
@@ -30,8 +30,8 @@
     .today-date{position:relative;z-index:1;margin-top:14px;font-size:30px;letter-spacing:-1.1px;font-weight:800}
     .today-weekday{position:relative;z-index:1;font-size:13.5px;opacity:.88;margin-top:6px}
     .card{background:var(--card);border:1px solid rgba(227,233,244,.9);box-shadow:0 16px 36px rgba(39,61,122,.055);border-radius:23px;padding:19px;margin-bottom:20px}
-    .tabs{display:grid;grid-template-columns:1fr 1fr;gap:7px;padding:5px;background:#f0f3fb;border-radius:15px;margin-bottom:23px}
-    .tab{border:0;border-radius:11px;background:transparent;padding:13px 8px;font-size:14px;font-weight:750;color:#7c89a4;cursor:pointer;font-family:inherit;transition:background .15s,color .15s,box-shadow .15s}
+    .tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;padding:5px;background:#f0f3fb;border-radius:15px;margin-bottom:23px}
+    .tab{border:0;border-radius:11px;background:transparent;padding:13px 4px;font-size:13px;font-weight:750;color:#7c89a4;cursor:pointer;font-family:inherit;transition:background .15s,color .15s,box-shadow .15s;white-space:nowrap;min-width:0}.tab:focus-visible{outline:2px solid #6957ed;outline-offset:2px}
     .tab.selected{background:white;color:#4c51bd;box-shadow:0 3px 9px rgba(65,87,146,.1)}
     .field{margin-top:17px}
     label{display:block;color:#3d4a67;font-size:14px;font-weight:750;margin-bottom:10px}
@@ -53,6 +53,7 @@
     .hidden{display:none!important}
     .invalid{color:#b42338;font-size:13px;min-height:18px;margin-top:10px}
     .hint{display:block;font-size:12px;margin-top:8px;color:var(--sub)}
+    @media(max-width:390px){.tab-icon{display:none}.tab{font-size:12.5px}}
     @media(min-width:600px){.shell{padding-top:50px}.brand{margin-bottom:38px}}
     @media(prefers-reduced-motion:reduce){*{transition:none!important}}
   </style>
@@ -66,7 +67,7 @@
 
     <div class="eyebrow">Tiện ích mỗi ngày</div>
     <h1>Mọi ngày đều<br>đáng <span style="color:#615ef0">đếm.</span></h1>
-    <p class="intro">Biết chính xác còn bao nhiêu ngày đến một dịp quan trọng, hoặc cộng ngày chỉ trong một chạm.</p>
+    <p class="intro">Biết còn bao nhiêu ngày đến một dịp quan trọng, hoặc cộng và trừ ngày, tháng chỉ trong một chạm.</p>
 
     <section class="today-card" aria-label="Ngày hiện tại">
       <div class="today-label">◷ &nbsp; Hôm nay · Tự động cập nhật</div>
@@ -76,8 +77,9 @@
 
     <section class="card" aria-label="Công cụ đếm và cộng ngày">
       <div class="tabs" role="tablist" aria-label="Chọn chức năng">
-        <button id="tab-count" class="tab selected" role="tab" aria-selected="true" aria-controls="panel-count" type="button">📅 &nbsp; Đếm ngày</button>
-        <button id="tab-add" class="tab" role="tab" aria-selected="false" aria-controls="panel-add" type="button">＋ &nbsp; Cộng ngày</button>
+        <button id="tab-count" class="tab selected" role="tab" aria-selected="true" aria-controls="panel-count" type="button"><span class="tab-icon" aria-hidden="true">📅</span> Đếm ngày</button>
+        <button id="tab-add" class="tab" role="tab" aria-selected="false" aria-controls="panel-add" type="button"><span class="tab-icon" aria-hidden="true">＋</span> Cộng ngày</button>
+        <button id="tab-month" class="tab" role="tab" aria-selected="false" aria-controls="panel-month" type="button"><span class="tab-icon" aria-hidden="true">🗓</span> Cộng tháng</button>
       </div>
       <div id="panel-count" role="tabpanel" aria-labelledby="tab-count">
         <div class="field">
@@ -98,6 +100,23 @@
         <div class="invalid" id="addError" role="alert"></div>
         <div class="result" id="addResult" aria-live="polite">
           <div class="result-tag">Ngày sau khi tính</div><div class="result-big date-mode" id="addAmount">--/--/----</div><div class="result-caption" id="addCaption">Nhập ngày bắt đầu và số ngày.</div>
+        </div>
+      </div>
+      <div id="panel-month" role="tabpanel" aria-labelledby="tab-month" class="hidden">
+        <div class="field">
+          <label for="monthStartDate">Ngày bắt đầu</label>
+          <div class="input-wrap"><span class="field-icon" aria-hidden="true">📆</span><input type="date" id="monthStartDate" aria-label="Ngày bắt đầu cộng tháng"></div>
+        </div>
+        <div class="field">
+          <label for="monthsToAdd">Số tháng muốn cộng (hoặc trừ)</label>
+          <div class="input-wrap"><span class="field-icon" aria-hidden="true">＋</span><input type="number" id="monthsToAdd" value="9" min="-1200" max="1200" step="1" inputmode="numeric" aria-label="Số tháng muốn cộng"></div>
+          <span class="hint">Ví dụ: 05/05/2026 + 9 tháng = 05/02/2027. Nhập -3 để lùi 3 tháng.</span>
+          <div class="micro">Nếu tháng đích không có ngày tương ứng (ví dụ 31/01 + 1 tháng), ứng dụng chọn ngày cuối cùng của tháng đó.</div>
+        </div>
+        <button type="button" class="action" id="calculateMonth">Bắt đầu tính <span aria-hidden="true">→</span></button>
+        <div class="invalid" id="monthError" role="alert"></div>
+        <div class="result" id="monthResult" aria-live="polite">
+          <div class="result-tag">Ngày sau khi tính</div><div class="result-big date-mode" id="monthAmount">--/--/----</div><div class="result-caption" id="monthCaption">Nhập ngày bắt đầu và số tháng.</div>
         </div>
       </div>
     </section>
@@ -152,11 +171,54 @@
       const weekday=weekdayFmt.format(final);
       $('addCaption').textContent=(days>=0?'Cộng ':'Trừ ')+numberFmt.format(Math.abs(days))+' ngày từ '+humanDate(start)+' · '+weekday+'.';
     }
-    function selectTab(mode){
-      const counting=mode==='count';
-      $('panel-count').classList.toggle('hidden',!counting);$('panel-add').classList.toggle('hidden',counting);
-      $('tab-count').classList.toggle('selected',counting);$('tab-add').classList.toggle('selected',!counting);
-      $('tab-count').setAttribute('aria-selected',String(counting));$('tab-add').setAttribute('aria-selected',String(!counting));
+    function addMonthsClamped(start, months) {
+      // Giữ nguyên ngày trong tháng nếu có thể; nếu không, lấy ngày cuối tháng đích.
+      const totalMonth = start.getUTCFullYear() * 12 + start.getUTCMonth() + months;
+      const year = Math.floor(totalMonth / 12);
+      const month = totalMonth - year * 12;
+      if (year < 1000 || year > 9999) return null;
+      const endOfMonth = new Date(0);
+      endOfMonth.setUTCFullYear(year, month + 1, 0);
+      endOfMonth.setUTCHours(0, 0, 0, 0);
+      const result = new Date(0);
+      result.setUTCFullYear(year, month, Math.min(start.getUTCDate(), endOfMonth.getUTCDate()));
+      result.setUTCHours(0, 0, 0, 0);
+      return result;
+    }
+    function calcMonth() {
+      refreshToday();
+      $('monthError').textContent = '';
+      const start = datePartsFromValue($('monthStartDate').value);
+      const raw = $('monthsToAdd').value.trim();
+      if (!start) { $('monthError').textContent = 'Vui lòng chọn ngày bắt đầu hợp lệ.'; return; }
+      if (!/^-?\d+$/.test(raw) || !Number.isSafeInteger(Number(raw)) || Math.abs(Number(raw)) > 1200) {
+        $('monthError').textContent = 'Nhập số tháng nguyên trong khoảng -1.200 đến 1.200.';
+        return;
+      }
+      const months = Number(raw);
+      const final = addMonthsClamped(start, months);
+      if (!final) { $('monthError').textContent = 'Ngày kết quả nằm ngoài phạm vi hỗ trợ.'; return; }
+      $('monthAmount').textContent = humanDate(final);
+      const adjusted = final.getUTCDate() !== start.getUTCDate();
+      $('monthCaption').textContent =
+        (months >= 0 ? 'Cộng ' : 'Trừ ') + numberFmt.format(Math.abs(months)) +
+        ' tháng từ ' + humanDate(start) + ' · ' + weekdayFmt.format(final) +
+        (adjusted ? '. Đã điều chỉnh về ngày cuối tháng.' : '.');
+    }
+    const tabModes = ['count', 'add', 'month'];
+    function selectTab(mode) {
+      tabModes.forEach(key => {
+        const active = key === mode;
+        $('panel-' + key).classList.toggle('hidden', !active);
+        $('tab-' + key).classList.toggle('selected', active);
+        $('tab-' + key).setAttribute('aria-selected', String(active));
+        $('tab-' + key).tabIndex = active ? 0 : -1;
+      });
+    }
+    function openTab(mode) {
+      selectTab(mode);
+      if (mode === 'add') calcAdd();
+      if (mode === 'month') calcMonth();
     }
     function init(){
       refreshToday();
@@ -164,12 +226,30 @@
       const plus30=new Date(current.getTime()+30*DAY_MS);
       $('targetDate').value=toInputUTC(plus30);
       $('startDate').value=toInputUTC(current);
-      $('tab-count').addEventListener('click',()=>selectTab('count'));
-      $('tab-add').addEventListener('click',()=>{selectTab('add');calcAdd()});
+      $('monthStartDate').value=toInputUTC(current);
+      tabModes.forEach((mode, index) => {
+        const tab = $('tab-' + mode);
+        tab.addEventListener('click', () => openTab(mode));
+        tab.addEventListener('keydown', event => {
+          let next = index;
+          if (event.key === 'ArrowRight') next = (index + 1) % tabModes.length;
+          else if (event.key === 'ArrowLeft') next = (index + tabModes.length - 1) % tabModes.length;
+          else if (event.key === 'Home') next = 0;
+          else if (event.key === 'End') next = tabModes.length - 1;
+          else return;
+          event.preventDefault();
+          openTab(tabModes[next]);
+          $('tab-' + tabModes[next]).focus();
+        });
+      });
+      selectTab('count');
       $('calculateCount').addEventListener('click',calcCount);
       $('calculateAdd').addEventListener('click',calcAdd);
+      $('calculateMonth').addEventListener('click',calcMonth);
       $('targetDate').addEventListener('change',calcCount);
       $('startDate').addEventListener('change',calcAdd);
+      $('monthStartDate').addEventListener('change',calcMonth);
+      $('monthsToAdd').addEventListener('input',calcMonth);
       $('daysToAdd').addEventListener('input',()=>{if($('daysToAdd').value)calcAdd()});
       document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshToday()});
       window.addEventListener('pageshow',refreshToday);

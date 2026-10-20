@@ -1,7 +1,7 @@
 {
-  "name": "Đếm Ngày+ — Đếm và cộng ngày",
+  "name": "Đếm Ngày+ — Đếm và cộng ngày, tháng",
   "short_name": "Đếm Ngày+",
-  "description": "Đếm số ngày còn lại và cộng hoặc trừ ngày chính xác trên iPhone.",
+  "description": "Đếm số ngày còn lại, cộng hoặc trừ ngày và tháng chính xác trên iPhone.",
   "lang": "vi",
   "start_url": "./",
   "scope": "./",
